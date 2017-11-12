@@ -51,9 +51,29 @@ Actor.prototype.setupTradingMethod = function() {
   // to the Consultant.
   var Consultant = require('./baseTradingMethod');
 
-  _.each(method, function(fn, name) {
+  //var stoploss_activated = stoploss_factor && !isNaN(stoploss_factor);
+  var methodStop = config[this.methodName].stop !== undefined;
+
+  var stoploss_activated = methodStop || config.stop.enabled;
+  var stoploss_factor = methodStop ? config[this.methodName].stop : config.stop.loss;
+
+  // require stop loss proxy strategy
+  var stopLoss = require(dirs.methods + 'stop-loss');
+  var owner = stoploss_activated ? stopLoss : method;
+
+  _.each(owner, function(fn, name) {
     Consultant.prototype[name] = fn;
   });
+
+  if (stoploss_activated) {
+    log.info('\t', 'Stop-Loss activated: ' + (stoploss_factor * 100) + '%');
+
+    _.each(method, function(fn, name) {
+      Consultant.prototype['strategy_' + name] = fn;
+    });
+
+    Consultant.prototype.stoploss_factor = stoploss_factor;
+  }
 
   if(config[this.methodName]) {
     var tradingSettings = config[this.methodName];
