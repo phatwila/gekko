@@ -41,7 +41,7 @@ stop.log = function(candle) {
   }
 }
 
-// checking the stop loss price and ging short if nessessary.
+// checking the stop loss price and going short if nessessary.
 // forwarding the candle to the strategy otherwise.
 stop.check = function(candle) {
   var price = candle.close;
