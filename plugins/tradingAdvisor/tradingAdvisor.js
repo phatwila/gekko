@@ -54,8 +54,26 @@ Actor.prototype.setupTradingMethod = function() {
   //var stoploss_activated = stoploss_factor && !isNaN(stoploss_factor);
   var methodStop = config[this.methodName].stop !== undefined;
 
+  /**
+
+    1. backtest
+
+    config[this.methodName].stop = 0.5
+    config[this.methodName].stop = {
+      loss: 0.1,
+      type: 'fixed|trailing' (optional)
+    }
+
+
+    2. config
+
+    percentage = config.stop.loss
+    type = config.stop.type
+  */
+
   var stoploss_activated = methodStop || config.stop.enabled;
-  var stoploss_factor = methodStop ? config[this.methodName].stop : config.stop.loss;
+  var stoploss_percentage = methodStop ? (!isNaN(config[this.methodName].stop) ? config[this.methodName].stop : config[this.methodName].stop.loss) : config.stop.loss;
+  var stoploss_type = methodStop && typeof config[this.methodName].stop === 'object' ? config[this.methodName].stop.type : (config.stop.type || 'fixed');
 
   // require stop loss proxy strategy
   var stopLoss = require(dirs.methods + 'stop-loss');
@@ -66,13 +84,16 @@ Actor.prototype.setupTradingMethod = function() {
   });
 
   if (stoploss_activated) {
-    log.info('\t', 'Stop-Loss activated: ' + (stoploss_factor * 100) + '%');
+    log.info('\t', stoploss_type + ' Stop-Loss activated: ' + (stoploss_percentage * 100).toFixed(5) + '%');
 
     _.each(method, function(fn, name) {
       Consultant.prototype['strategy_' + name] = fn;
     });
 
-    Consultant.prototype.stoploss_factor = stoploss_factor;
+    Consultant.prototype.stoploss = {
+      percentage: stoploss_percentage,
+      type: stoploss_type
+    };
   }
 
   if(config[this.methodName]) {
