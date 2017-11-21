@@ -71,8 +71,16 @@ Actor.prototype.setupTradingMethod = function() {
     type = config.stop.type
   */
 
-  var stoploss_activated = methodStop || config.stop.enabled;
-  var stoploss_percentage = methodStop ? (!isNaN(config[this.methodName].stop) ? config[this.methodName].stop : config[this.methodName].stop.loss) : config.stop.loss;
+  var stoploss_activated = methodStop || config.stop.enabled || false;
+  var stoploss_percentage = config.stop.loss || 0;
+
+  // using stop params from backtest
+  // stop = 0.1
+  // stop = { loss: 0.1 }
+  if (methodStop) {
+    stoploss_percentage = !isNaN(config[this.methodName].stop) ? config[this.methodName].stop : config[this.methodName].stop.loss;
+  }
+
   var stoploss_type = methodStop && typeof config[this.methodName].stop === 'object' ? config[this.methodName].stop.type : (config.stop.type || 'fixed');
 
   // require stop loss proxy strategy
