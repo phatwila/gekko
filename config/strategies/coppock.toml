@@ -1,0 +1,7 @@
+[psar]
+optInAcceleration = 0.02
+optInMaximum = 0.2
+[ema1]
+optInTimePeriod = 5
+[ema2]
+optInTimePeriod = 15
