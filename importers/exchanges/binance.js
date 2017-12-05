@@ -17,42 +17,36 @@ var from = false;
 var fetcher = new Fetcher(config.watch);
 
 var fetch = () => {
-    fetcher.import = true;
-    fetcher.getTrades(from, handleFetch);
-}
+  fetcher.import = true;
+  fetcher.getTrades(from, handleFetch);
+};
 
 var handleFetch = (unk, trades) => {
-    var last = moment.unix(_.last(trades).date);
+  if (trades.length > 0) {
+    var last = moment.unix(_.last(trades).date).utc();
+    var next = last.clone();
+  } else {
+    var next = from.clone().add(1, 'd');
+    log.debug('Import step returned no results, moving to the next 24h period');
+  }
 
-    if(last < from) {
-        log.debug('Skipping data, they are before from date (probably a programming error)', last.format());
-        return fetch();
-    }
+  if (from.add(1, 'd') >= end) {
+    fetcher.emit('done');
 
-    var next = from.add(1, 'd');
-    if  (next >= end) {
-        fetcher.emit('done');
+    var endUnix = end.unix();
+    trades = _.filter(trades, t => t.date <= endUnix);
+  }
 
-        var endUnix = end.unix();
-        trades = _.filter(
-            trades,
-            t => t.date <= endUnix
-        )
-    }
+  from = next.clone();
+  fetcher.emit('trades', trades);
+};
 
-    from = next.clone();
-    fetcher.emit('trades', trades);
-}
+module.exports = function(daterange) {
+  from = daterange.from.clone().utc();
+  end = daterange.to.clone().utc();
 
-module.exports = function (daterange) {
-
-    from = daterange.from.clone();
-    end = daterange.to.clone();
-
-    return {
-        bus: fetcher,
-        fetch: fetch
-    }
-}
-
-
+  return {
+    bus: fetcher,
+    fetch: fetch,
+  };
+};
