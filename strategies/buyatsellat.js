@@ -11,10 +11,10 @@ method.init = function() {
     this.name = 'buyatsellat';
 
 	// Pull settings from configuration instead of hardcoding.
-    const buyat = this.settings.buyat
-    const sellat = this.settings.sellat
-    const stop_loss_pct = this.settings.stop_loss_pct
-    const sellat_up = this.settings.sellat_up
+    this.buyat_s = this.settings.buyat;
+    this.sellat_s = this.settings.sellat;
+    this.stop_loss_pct_s = this.settings.stop_loss_pct;
+    this.sellat_up_s = this.settings.sellat_up;
 
     this.previousAction = 'sell';
     this.previousActionPrice = Infinity;
@@ -35,10 +35,10 @@ method.check = function(candle) {
 
     if (this.previousAction === "buy") {
         // calculate the minimum price in order to sell
-        const threshold = this.previousActionPrice * buyat;
+        const threshold = this.previousActionPrice * this.buyat_s;
 
         // calculate the stop loss price in order to sell
-        const stop_loss = this.previousActionPrice * stop_loss_pct;
+        const stop_loss = this.previousActionPrice * this.stop_loss_pct_s;
 
         // we sell if the price is more than the required threshold or equals stop loss threshold
         if ((candle.close > threshold) || (candle.close < stop_loss)) {
@@ -48,13 +48,13 @@ method.check = function(candle) {
         }
     } else if (this.previousAction === "sell") {
         // calculate the minimum price in order to buy
-        const threshold = this.previousActionPrice * sellat;
+        const threshold = this.previousActionPrice * this.sellat_s;
 
         // calculate the price at which we should buy again if market goes up
-        const sellat_up_price = this.previousActionPrice * sellat_up;
+        const sellat_s_up_price = this.previousActionPrice * this.sellat_s_up;
 
         // we buy if the price is less than the required threshold or greater than Market Up threshold
-        if ((candle.close < threshold) || (candle.close > sellat_up_price)) {
+        if ((candle.close < threshold) || (candle.close > sellat_s_up_price)) {
             this.advice('long');
             this.previousAction = 'buy';
             this.previousActionPrice = candle.close;
