@@ -28,10 +28,10 @@ method.log = function(candle) {
 }
 
 method.check = function(candle) {  
-	const buyat = 1.05; // profit limit percentage (e.g. 1.15 for 15%)
+	const buyat = 1.06; // profit limit percentage (e.g. 1.15 for 15%)
 	const sellat = 0.97; // amount of percentage from last buy if market goes down (e.g. 0.97 for 3%)
-	const stop_loss_pct = 0.95; // stop loss percentage (e.g. 0.95 for 5%)
-	const sellat_up = 1.01; // amount of percentage from last buy if market goes up (e.g. 1.01 for 1%)
+	const stop_loss_pct = 0.90; // stop loss percentage (e.g. 0.95 for 5%)
+	const sellat_up = 1.05; // amount of percentage from last buy if market goes up (e.g. 1.01 for 1%)
 
   if(this.previousAction === "buy") {
     // calculate the minimum price in order to sell

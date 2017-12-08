@@ -46,6 +46,11 @@ config.tradingAdvisor = {
   }
 }
 
+config.stop = {
+  enabled: true,
+  loss: 0.1
+}
+
 // Exponential Moving Averages settings:
 config.DEMA = {
   // EMA weight (α)
@@ -187,6 +192,42 @@ config['talib-macd'] = {
     up: 0.025,
   }
 }
+
+// Supertrend Strategy
+config.Supertrend = { 
+	atrEma: 7, 
+	bandFactor: 3, 
+};
+
+// Gannswing Strategy
+config.gannswing = {
+  // stop-loss
+  stoploss: {
+    // enable/disable stop loss sells
+    enabled: true,
+    // if stop-loss is enabled, shall it be trailing?
+    trailing: true,
+    // how many percent before we trigger stop-loss sell?
+    percent: 5
+  }, 
+  vixperiod: 20,
+  // trend reaction time between 50 and 250
+  swingperiod: 250
+};
+
+// EXPERIMENTAL - Coppock + PSAR + EMA Strategy
+config.coppock = {
+	psar: {
+		optInAcceleration: 0.02,
+		optInMaximum: 0.1
+	},
+	ema1: {
+		optInTimePeriod: 4
+	},
+	ema2: {
+		optInTimePeriod: 14
+	},
+};
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //                       CONFIGURING PLUGINS

@@ -51,9 +51,58 @@ Actor.prototype.setupTradingMethod = function() {
   // to the Consultant.
   var Consultant = require('./baseTradingMethod');
 
-  _.each(method, function(fn, name) {
+  //var stoploss_activated = stoploss_factor && !isNaN(stoploss_factor);
+  var methodStop = config[this.methodName].stop !== undefined;
+
+  /**
+
+    1. backtest
+
+    config[this.methodName].stop = 0.5
+    config[this.methodName].stop = {
+      loss: 0.1,
+      type: 'fixed|trailing' (optional)
+    }
+
+
+    2. config
+
+    percentage = config.stop.loss
+    type = config.stop.type
+  */
+
+  var stoploss_activated = methodStop || config.stop.enabled || false;
+  var stoploss_percentage = config.stop.loss || 0;
+
+  // using stop params from backtest
+  // stop = 0.1
+  // stop = { loss: 0.1 }
+  if (methodStop) {
+    stoploss_percentage = !isNaN(config[this.methodName].stop) ? config[this.methodName].stop : config[this.methodName].stop.loss;
+  }
+
+  var stoploss_type = methodStop && typeof config[this.methodName].stop === 'object' ? config[this.methodName].stop.type : (config.stop.type || 'fixed');
+
+  // require stop loss proxy strategy
+  var stopLoss = require(dirs.methods + 'stop-loss');
+  var owner = stoploss_activated ? stopLoss : method;
+
+  _.each(owner, function(fn, name) {
     Consultant.prototype[name] = fn;
   });
+
+  if (stoploss_activated) {
+    log.info('\t', stoploss_type + ' Stop-Loss activated: ' + (stoploss_percentage * 100).toFixed(5) + '%');
+
+    _.each(method, function(fn, name) {
+      Consultant.prototype['strategy_' + name] = fn;
+    });
+
+    Consultant.prototype.stoploss = {
+      percentage: stoploss_percentage,
+      type: stoploss_type
+    };
+  }
 
   if(config[this.methodName]) {
     var tradingSettings = config[this.methodName];
