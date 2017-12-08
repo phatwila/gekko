@@ -193,13 +193,13 @@ config['talib-macd'] = {
   }
 }
 
-// Supertrend Strategy
+// Supertrend settings
 config.Supertrend = { 
 	atrEma: 7, 
 	bandFactor: 3, 
 };
 
-// Gannswing Strategy
+// Gannswing settings
 config.gannswing = {
   // stop-loss
   stoploss: {
@@ -215,7 +215,7 @@ config.gannswing = {
   swingperiod: 250
 };
 
-// EXPERIMENTAL - Coppock + PSAR + EMA Strategy
+// EXPERIMENTAL - Coppock + PSAR + EMA settings
 config.coppock = {
 	psar: {
 		optInAcceleration: 0.02,
@@ -227,6 +227,18 @@ config.coppock = {
 	ema2: {
 		optInTimePeriod: 14
 	},
+};
+
+// buyatsellat settings
+config.buyatsellat = { 
+ 	// profit limit percentage (e.g. 1.15 for 15%)
+	buyat: 1.15,
+	// amount of percentage from last buy if market goes down (e.g. 0.97 for 3%)
+	sellat: 0.97, 
+	// stop loss percentage (e.g. 0.95 for 5%)
+	stop_loss_pct: 0.95, 
+	// amount of percentage from last buy if market goes up (e.g. 1.01 for 1%) 
+	sellat_up: 1.01, 
 };
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
